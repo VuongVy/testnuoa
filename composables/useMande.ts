@@ -15,3 +15,14 @@ export const useMande = async () => {
 
   return api
 }
+
+export type PCF = {
+  pcfId: string
+  productName: string
+  version: string
+
+  /**
+   * @example 2024-07-02
+   */
+  datePublished: string
+}

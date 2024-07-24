@@ -38,7 +38,7 @@
         </tr>
       </thead>
       <tbody>
-
+<!-- 
         <tr class="hover">
           <th>abc1</th>
           <td>product1</td>
@@ -49,17 +49,18 @@
           <td>
             <a class="link" @click="requestAccess">Request Access</a>
           </td>
-        </tr>
+        </tr> -->
 
-        <tr class="hover">
-          <th>abc1</th>
-          <td>product1</td>
-          <td>Windshield</td>
-          <td>Company B</td>
-          <td>1</td>
-          <td>07/005/2024</td>
+        <tr v-for="item in pcfs" class="hover">
+          <th>{{ item.pcfId }}</th>
+          <td>---</td>
+          <td>{{ item.productName }}</td>
+          <td>---</td>
+          <td>{{ item.version }}</td>
+          <td>{{ item.datePublished.split('-').reverse().map(it => +it).join('/') }}</td>
           <td>
-            <span class="text-yellow-500">Pending</span>
+            ---
+            <!-- <span class="text-yellow-500">Pending</span> -->
           </td>
         </tr>
       </tbody>
@@ -85,18 +86,20 @@
 <script lang="ts" setup>
 import DataViewPaginate from '~/components/DataViewPaginate.vue'
 import Modal from '~/components/Modal.vue'
-import { useMande } from '~/composables/useMande'
-
+import { useMande, type PCF } from '~/composables/useMande'
 
 const requestDialog = ref<InstanceType<typeof Modal>>()
 const request = reactive({ content: '' })
 const api = await useMande()
+
+const pcfs = ref(new Array<PCF>())
 
 const requestAccess = () => {
   requestDialog.value?.show()
 }
 
 onMounted(async () => {
-  api.get('/pcf', { query: { dataOwnerId: '' } }).then(console.log)
+  api.get<{ pcfs: PCF[] }>('/pcf', { query: { dataOwnerId: '', approvedRecipients: '' } })
+    .then(data => pcfs.value = data.pcfs)
 })
 </script>
