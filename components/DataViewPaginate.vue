@@ -11,28 +11,30 @@
     </div>
 
     <hr>
-    <div class="py-3 px-4 flex justify-between">
-      <span></span>
+    <slot name="footer">
+      <div class="py-3 px-4 flex justify-between">
+        <span></span>
 
-      <div class="flex text-sm opacity-90">
-        <div class="mt-1.5">
-          Row Per Page:
-          <select v-model="selected" class="select select-xs">
-            <option v-for="item in perPage" :value="item" :selected="item === take">{{ item }}</option>
-          </select>
-        </div>
+        <div class="flex text-sm opacity-90">
+          <div class="mt-1.5">
+            Row Per Page:
+            <select v-model="selected" class="select select-xs">
+              <option v-for="item in perPage" :value="item" :selected="item === take">{{ item }}</option>
+            </select>
+          </div>
 
-        <div class="flex space-x-2">
-          <button class="btn btn-sm btn-circle btn-ghost">
-            <Icon name="fe:arrow-left" class="size-5" @click="emit('prev')" />
-          </button>
-          <span class="mt-1.5">1-3 of 3</span>
-          <div class="btn btn-sm btn-circle btn-ghost" @click="emit('next')">
-            <Icon name="fe:arrow-right" class="size-5" />
+          <div class="flex space-x-2">
+            <button class="btn btn-sm btn-circle btn-ghost">
+              <Icon name="fe:arrow-left" class="size-5" @click="emit('prev')" />
+            </button>
+            <span class="mt-1.5">1-3 of 3</span>
+            <div class="btn btn-sm btn-circle btn-ghost" @click="emit('next')">
+              <Icon name="fe:arrow-right" class="size-5" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </slot>
   </div>
 </template>
 

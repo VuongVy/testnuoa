@@ -41,4 +41,5 @@
 
 <script lang="ts" setup>
 await new Promise(r => setTimeout(r, 2000))
+useBreadcrumb('PCF Details')
 </script>

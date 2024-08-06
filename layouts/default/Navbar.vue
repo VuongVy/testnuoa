@@ -1,6 +1,8 @@
 <template>
   <div class="flex justify-between px-5 py-3">
-    <div></div>
+    <div>
+      <Breadcrumb />
+    </div>
 
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle ring-1 ring-black/40">

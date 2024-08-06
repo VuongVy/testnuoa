@@ -45,3 +45,8 @@
     <NuxtPage class="mt-5" :transition="{ name: 'slide-right', mode: 'out-in' }" />
   </div>
 </template>
+
+
+<script lang="ts" setup>
+useBreadcrumb('Home')
+</script>
