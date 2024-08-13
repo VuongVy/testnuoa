@@ -22,15 +22,17 @@
       </thead>
       <tbody>
 
-        <tr class="hover cursor-pointer" @click="navigateTo('/me/published/detail')">
-          <th>abc1</th>
-          <td>product1</td>
-          <td>Door Card</td>
-          <td>5</td>
-          <td>300 tCO2</td>
-          <td>1</td>
+        <tr v-for="pcf of pcfs" class="hover cursor-pointer" @click="navigateTo(`/me/published/${pcf.pcfId}`)">
+          <th>{{ pcf.pcfId }}</th>
+          <td>{{ pcf.productId }}</td>
+          <td>{{ pcf.productName }}</td>
+          <td>{{ pcf.amount }}</td>
+          <td>{{ pcf.emissionPerUnit }}</td>
+          <td>{{ pcf.version }}</td>
           <td>
-            <a class="link link-success" @click="">Active</a>
+            <a class="text-success" v-if="pcf.pcfStatus === 'active'">Active</a>
+            <a class="text-error" v-else-if="pcf.pcfStatus === 'deprecated'">Deprecated</a>
+            <a class="text-warning" v-else>{{ pcf.pcfStatus }}</a>
           </td>
         </tr>
 
@@ -40,7 +42,24 @@
 </template>
 
 <script lang="ts" setup>
+import { useAuthenticator } from '@aws-amplify/ui-vue'
+import type { MandeInstance } from 'mande'
 import DataViewPaginate from '~/components/DataViewPaginate.vue'
+import type { Authenticator } from '~/global'
 
 useBreadcrumb('All published PCFs')
+
+const api = inject<MandeInstance>('api')!
+const auth = useAuthenticator() as Authenticator
+
+const pcfs = ref<PCF[]>([])
+
+onMounted(async () => {
+  const response = await api.get<{ pcfs: PCF[] }>('/pcf', {
+    query: { dataOwnerId: auth.user?.userId }
+  })
+
+  pcfs.value = response.pcfs
+})
+
 </script>

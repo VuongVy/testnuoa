@@ -1,10 +1,20 @@
 
 <template>
   <transition name="fade" appear>
-    <div role="alert" class="alert bg-green-200 shadow my-3">
-      <Icon name="fa:paper-plane" class="text-success size-7" />
+    <div v-if="status?.success" role="alert" class="alert bg-green-200 shadow my-3">
+      <Icon name="fa:paper-plane" class="text-success size-7" @click="status = undefined" />
 
-      <span>Your request has been sent. A notification will be sent to the DO shortly. Please be patient!!!</span>
+      <span>{{ status.message }}</span>
+
+      <button class="btn btn-sm btn-ghost btn-circle">
+        <Icon name="ic:close" class="size-6" />
+      </button>
+    </div>
+
+    <div v-else-if="status?.success === false" role="alert" class="alert bg-red-200 shadow my-3" >
+      <Icon name="fa:paper-plane" class="text-error size-7" @click="status = undefined" />
+
+      <span>{{ status.message }}</span>
 
       <button class="btn btn-sm btn-ghost btn-circle">
         <Icon name="ic:close" class="size-6" />
@@ -36,70 +46,49 @@
         </tr>
       </thead>
       <tbody>
-<!--
-        <tr class="hover">
-          <th>abc1</th>
-          <td>product1</td>
-          <td>Door Card</td>
-          <td>Company A</td>
-          <td>1</td>
-          <td>07/005/2024</td>
-          <td>
-            <a class="link" @click="requestAccess">Request Access</a>
-          </td>
-        </tr> -->
-
         <tr v-for="item in pcfs" class="hover">
           <th>{{ item.pcfId }}</th>
-          <td>---</td>
+          <td>{{ item.productId }}</td>
           <td>{{ item.productName }}</td>
-          <td>---</td>
+          <td>{{ item.dataOwnerId ?? '---' }}</td>
           <td>{{ item.version }}</td>
           <td>{{ item.datePublished.split('-').reverse().map(it => +it).join('/') }}</td>
-          <td>
-            <a class="link text-blue-600" @click="requestDialog!.show()">Request Access</a >
+          <td v-if="user?.userId !== item.dataOwnerId">
+            <a class="link text-blue-600" @click="requester!.open(item.pcfId, item.version, user?.userId!)">Request Access</a >
             <!-- <span class="text-yellow-500">Pending</span> -->
           </td>
+          <td v-else>---</td>
         </tr>
       </tbody>
     </table>
   </DataViewPaginate>
 
-  <Modal ref="requestDialog" v-slot="{ close }">
-    <h3 class="text-2xl font-semibold opacity-80 mb-3">Requesting Access</h3>
-
-    <div class="py-5 border-y space-y-3">
-      <p><strong>PCF ID:</strong> abc3</p>
-      <p><strong>Please provide the reason why you need to access the PCF:</strong></p>
-      <textarea v-model="request.content" class="textarea w-full textarea-bordered" placeholder="Message here..."></textarea>
-    </div>
-
-    <div class="modal-action">
-      <button class="btn btn-error text-white" @click="close">Close</button>
-      <button class="btn btn-success text-white" @click="close">Submit</button>
-    </div>
-  </Modal>
+  <Teleport to="body">
+    <RequestDialog ref="requester" @status="event => status = event"/>
+  </Teleport>
+  
 </template>
 
 <script lang="ts" setup>
 import DataViewPaginate from '~/components/DataViewPaginate.vue'
-import Modal from '~/components/Modal.vue'
+import RequestDialog, { type SubmitResponse } from './browse/RequestDialog.vue'
 import { useMande, type PCF } from '~/composables/useMande'
+import { useAuthenticator } from '@aws-amplify/ui-vue'
+import type { Authenticator } from '~/global';
 
-const requestDialog = ref<InstanceType<typeof Modal>>()
-const request = reactive({ content: '' })
+const requester = ref<InstanceType<typeof RequestDialog>>()
+const status = ref<SubmitResponse>()
 const api = await useMande()
+const { user } = useAuthenticator() as Authenticator
 
 const pcfs = ref(new Array<PCF>())
 
 useBreadcrumb('Browse PCFs Page')
 
-const requestAccess = () => {
-  requestDialog.value?.show()
-}
-
 onMounted(async () => {
-  api.get<{ pcfs: PCF[] }>('/pcf', { query: { dataOwnerId: '', approvedRecipients: '' } })
+  api.get<{ pcfs: PCF[], lastEvaluatedKey?: string }>('/pcf', {
+    query: { dataOwnerId: '', approvedRecipients: '' }
+  })
     .then(data => pcfs.value = data.pcfs)
 })
 </script>

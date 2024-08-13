@@ -27,7 +27,7 @@
             <button class="btn btn-sm btn-circle btn-ghost">
               <Icon name="fe:arrow-left" class="size-5" @click="emit('prev')" />
             </button>
-            <span class="mt-1.5">1-3 of 3</span>
+            <!-- <span class="mt-1.5">1-3 of 3</span> -->
             <div class="btn btn-sm btn-circle btn-ghost" @click="emit('next')">
               <Icon name="fe:arrow-right" class="size-5" />
             </div>
@@ -43,8 +43,8 @@ import type { PropType } from 'vue'
 
 const props = defineProps({
   title: { type: String },
-  perPage: { type: Array as PropType<number[]>, default: () => [10, 20, 30, 40, 50, 100, 200] },
-  take: { type: Number, default: 20 }
+  perPage: { type: Array as PropType<number[]>, default: () => [10] },
+  take: { type: Number, default: 10 }
 })
 
 const selected = ref(props.take)

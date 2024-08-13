@@ -15,7 +15,7 @@ export default defineNuxtPlugin(() => {
     },
     {
       name: 'stage',
-      endpoint: 'https://tlr505w5if.execute-api.ap-southeast-1.amazonaws.com/Stage',
+      endpoint: 'https://tlr505w5if.execute-api.ap-southeast-1.amazonaws.com/dev',
       region: 'ap-southeast-1'
     }
   ]

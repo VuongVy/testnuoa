@@ -17,34 +17,46 @@
       </thead>
       <tbody class="cursor-pointer">
 
-        <tr class="hover" @click="navigateTo('/home/123')">
-          <th>abc1</th>
-          <td>product1</td>
-          <td>Door Card</td>
-          <td>Company A</td>
-          <td>1</td>
-          <td>07/005/2024</td>
+        <tr v-for="item, i of requests" class="hover" @click="navigateTo('/home/' + item.requestId.split(',')[0])">
+          <th>{{ i + 1 }}</th>
+          <td>---</td>
+          <td>---</td>
+          <td>{{ item.dataOwnerId }}</td>
+          <td>{{ item.version }}</td>
+          <td>{{ item.dateProcessed.split('-').reverse().join('/') }}</td>
           <td>
-            <span class="font-bold text-primary">Approved</span>
+            <span class="font-bold" :class="{
+              'text-success': item.requestStatus === 'approved',
+              'text-error': item.requestStatus === 'denied',
+              'text-warning': item.requestStatus === 'pending'
+            }">
+              {{ item.requestStatus }}
+            </span>
           </td>
         </tr>
 
-        <tr class="hover" @click="navigateTo('/home/123')">
-          <th>abc1</th>
-          <td>product1</td>
-          <td>Windshield</td>
-          <td>Company B</td>
-          <td>1</td>
-          <td>07/005/2024</td>
-          <td>
-            <span class="font-bold text-error">Denied</span>
-          </td>
-        </tr>
       </tbody>
     </table>
   </DataViewPaginate>
 </template>
 
 <script lang="ts" setup>
+import { useAuthenticator } from '@aws-amplify/ui-vue'
+import type { MandeInstance } from 'mande'
 import DataViewPaginate from '~/components/DataViewPaginate.vue'
+import type { RequestAccess } from '~/composables/useMande';
+import type { Authenticator } from '~/global'
+
+const api = inject<MandeInstance>('api')!
+const auth = useAuthenticator() as Authenticator
+
+const requests = ref<RequestAccess[]>([])
+
+onMounted(async () => {
+  const response = await api.get<{ requests: RequestAccess[] }>('/request', {
+    query: { dataRequestorId: auth.user?.userId }
+  })
+
+  requests.value = response.requests
+})
 </script>

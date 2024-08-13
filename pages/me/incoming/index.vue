@@ -3,7 +3,6 @@
     <template #title>
       <div class="flex justify-between space-x-3 px-3">
         <h3 class="card-title font-bold">Current Requests</h3>
-        <NuxtLink to="/me/published/create" class="btn btn-sm btn-success">New PCF</NuxtLink>
       </div>
       <hr>
     </template>
@@ -22,8 +21,8 @@
       </thead>
       <tbody>
 
-        <tr class="hover">
-          <th>1</th>
+        <tr v-for="item of requests" class="hover">
+          <th></th>
           <td>Company A</td>
           <td>abc1</td>
           <td>product1</td>
@@ -42,5 +41,20 @@
 </template>
 
 <script lang="ts" setup>
+import { useAuthenticator } from '@aws-amplify/ui-vue'
+import type { MandeInstance } from 'mande'
 import DataViewPaginate from '~/components/DataViewPaginate.vue'
+import type { RequestAccess } from '~/composables/useMande';
+import type { Authenticator } from '~/global'
+
+const api = inject<MandeInstance>('api')!
+const auth = useAuthenticator() as Authenticator
+
+const requests = ref<RequestAccess[]>([])
+
+onMounted(async () => {
+   await api.get<{ requests: RequestAccess[] }>('/request', {
+    query: { dataRequestorId: '' ?? auth.user?.userId }
+  })
+})
 </script>

@@ -20,9 +20,33 @@ export type PCF = {
   pcfId: string
   productName: string
   version: string
+  productId: string
+
+  dataOwnerId?: string
+
+  pcfStatus?: 'active'|'pending'|'deprecated'
+  amount?: number
+  emissionPerUnit?: string
+  additionalData?: Record<string, string>
+  approvedRecipients?: string[]
+
 
   /**
    * @example 2024-07-02
    */
   datePublished: string
+}
+
+export type RequestAccess = {
+  requestId: string
+  dataOwnerId: string
+
+  /** Format YYYY-MM-DD */
+  dateProcessed: string
+  /** Format YYYY-MM-DD */
+  dateRequested: string
+
+  message: string
+  requestStatus: 'approved'|'pending'|'denied'
+  version: number
 }

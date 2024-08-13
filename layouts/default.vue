@@ -30,6 +30,18 @@ const drawer = ref(false)
 provide('sidebar:toggle', () => drawer.value = !drawer.value)
 
 const auth = useAuthenticator() as UseAuthenticator
+const api = await useMande().catch(() => undefined)
+provide('api', api)
+
+
+onMounted(() => {
+  if (auth.authStatus === 'unauthenticated') {
+    navigateTo('/auth/login')
+  }
+
+  // @ts-ignore for debug
+  window.api = api
+})
 
 watch(() => auth.authStatus, async (value) => {
   if (value === 'unauthenticated') {
