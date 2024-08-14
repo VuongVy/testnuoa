@@ -1,8 +1,15 @@
-
 <template>
   <transition name="fade" appear>
-    <div v-if="status?.success" role="alert" class="alert bg-green-200 shadow my-3">
-      <Icon name="fa:paper-plane" class="text-success size-7" @click="status = undefined" />
+    <div
+      v-if="status?.success"
+      role="alert"
+      class="alert bg-green-200 shadow my-3"
+    >
+      <Icon
+        name="fa:paper-plane"
+        class="text-success size-7"
+        @click="status = undefined"
+      />
 
       <span>{{ status.message }}</span>
 
@@ -11,8 +18,16 @@
       </button>
     </div>
 
-    <div v-else-if="status?.success === false" role="alert" class="alert bg-red-200 shadow my-3" >
-      <Icon name="fa:paper-plane" class="text-error size-7" @click="status = undefined" />
+    <div
+      v-else-if="status?.success === false"
+      role="alert"
+      class="alert bg-red-200 shadow my-3"
+    >
+      <Icon
+        name="fa:paper-plane"
+        class="text-error size-7"
+        @click="status = undefined"
+      />
 
       <span>{{ status.message }}</span>
 
@@ -27,7 +42,12 @@
       <div class="flex space-x-3">
         <h3 class="card-title">Available PCFs</h3>
         <label class="input input-bordered input-sm flex items-center gap-2">
-          <input type="text" class="grow" placeholder="Search" @keypress.enter="console.log('searching')"/>
+          <input
+            type="text"
+            class="grow"
+            placeholder="Search"
+            @keypress.enter="console.log('searching')"
+          />
           <Icon name="ic:search" />
         </label>
       </div>
@@ -36,8 +56,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Product ID</th>
+          <th>PCF ID</th>
           <th>Product Name</th>
           <th>Data Owner</th>
           <th>Version</th>
@@ -48,13 +67,24 @@
       <tbody>
         <tr v-for="item in pcfs" class="hover">
           <th>{{ item.pcfId }}</th>
-          <td>{{ item.productId }}</td>
           <td>{{ item.productName }}</td>
-          <td>{{ item.dataOwnerId ?? '---' }}</td>
+          <td>{{ item.company ?? "---" }}</td>
           <td>{{ item.version }}</td>
-          <td>{{ item.datePublished.split('-').reverse().map(it => +it).join('/') }}</td>
+          <td>
+            {{
+              item.datePublished
+                .split("-")
+                .reverse()
+                .map((it) => +it)
+                .join("/")
+            }}
+          </td>
           <td v-if="user?.userId !== item.dataOwnerId">
-            <a class="link text-blue-600" @click="requester!.open(item.pcfId, item.version, user?.userId!)">Request Access</a >
+            <a
+              class="link text-blue-600"
+              @click="requester!.open(item.pcfId, item.version, user?.userId!)"
+              >Request Access</a
+            >
             <!-- <span class="text-yellow-500">Pending</span> -->
           </td>
           <td v-else>---</td>
@@ -64,31 +94,39 @@
   </DataViewPaginate>
 
   <Teleport to="body">
-    <RequestDialog ref="requester" @status="event => status = event"/>
+    <RequestDialog ref="requester" @status="(event) => (status = event)" />
   </Teleport>
-  
 </template>
 
 <script lang="ts" setup>
-import DataViewPaginate from '~/components/DataViewPaginate.vue'
-import RequestDialog, { type SubmitResponse } from './browse/RequestDialog.vue'
-import { useMande, type PCF } from '~/composables/useMande'
-import { useAuthenticator } from '@aws-amplify/ui-vue'
-import type { Authenticator } from '~/global';
+import { ref, onMounted } from "vue";
+import DataViewPaginate from "~/components/DataViewPaginate.vue";
+import RequestDialog, { type SubmitResponse } from "./browse/RequestDialog.vue";
+import { useMande, type PCF } from "~/composables/useMande";
+import { useAuthenticator } from "@aws-amplify/ui-vue";
+import type { Authenticator } from "~/global";
 
-const requester = ref<InstanceType<typeof RequestDialog>>()
-const status = ref<SubmitResponse>()
-const api = await useMande()
-const { user } = useAuthenticator() as Authenticator
+const requester = ref<InstanceType<typeof RequestDialog>>();
+const status = ref<SubmitResponse | undefined>(undefined);
+const api = await useMande();
+const { user } = useAuthenticator() as Authenticator;
 
-const pcfs = ref(new Array<PCF>())
+const pcfs = ref<PCF[]>([]);
 
-useBreadcrumb('Browse PCFs Page')
+useBreadcrumb("Browse PCFs Page"); // Ensure useBreadcrumb is imported and defined
 
 onMounted(async () => {
-  api.get<{ pcfs: PCF[], lastEvaluatedKey?: string }>('/pcf', {
-    query: { dataOwnerId: '', approvedRecipients: '' }
-  })
-    .then(data => pcfs.value = data.pcfs)
-})
+  try {
+    const response = await api.get<{ pcfs: PCF[]; lastEvaluatedKey?: string }>(
+      "/pcf",
+      {
+        query: { isDataOwner: "false" },
+      }
+    );
+    pcfs.value = response.pcfs;
+  } catch (error) {
+    console.error("Error fetching PCFs:", error);
+    // Optionally, handle the error, e.g., show a notification to the user
+  }
+});
 </script>

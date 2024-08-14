@@ -2,7 +2,7 @@
   <DataViewPaginate class="min-h-[60vh]">
     <template #title>
       <div class="flex justify-between space-x-3 px-3">
-        <h3 class="card-title font-bold">My published PCFs</h3>
+        <h3 class="card-title font-bold">PCFs Shared With Me</h3>
         <NuxtLink to="/me/published/create" class="btn btn-sm btn-success"
           >New PCF</NuxtLink
         >
@@ -14,11 +14,10 @@
       <thead>
         <tr>
           <th>PCF ID</th>
-          <th>Product ID</th>
           <th>Product Name</th>
-          <th>Amount</th>
-          <th>Emission per Unit</th>
-          <th>version</th>
+          <th>Data Owner</th>
+          <th>Date Published</th>
+          <th>Version</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -26,13 +25,12 @@
         <tr
           v-for="pcf of pcfs"
           class="hover cursor-pointer"
-          @click="navigateTo(`/me/published/${pcf.pcfId}`)"
+          @click="navigateTo(`/me/shared/${pcf.pcfId}`)"
         >
           <th>{{ pcf.pcfId }}</th>
-          <td>{{ pcf.productId }}</td>
           <td>{{ pcf.productName }}</td>
-          <td>{{ pcf.amount }}</td>
-          <td>{{ pcf.emissionPerUnit }}</td>
+          <td>{{ pcf.company }}</td>
+          <td>{{ pcf.datePublished }}</td>
           <td>{{ pcf.version }}</td>
           <td>
             <a class="text-success" v-if="pcf.pcfStatus === 'active'">Active</a>
@@ -62,7 +60,7 @@ const pcfs = ref<PCF[]>([]);
 
 onMounted(async () => {
   const response = await api.get<{ pcfs: PCF[] }>("/pcf", {
-    query: { isDataOwner: "true", userId: auth.user?.userId },
+    query: { isSharedWithMe: "true" },
   });
 
   pcfs.value = response.pcfs;

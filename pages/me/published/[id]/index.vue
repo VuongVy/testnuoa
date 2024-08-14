@@ -1,50 +1,25 @@
-
 <template>
   <div>
     <DataViewPaginate v-if="pcf">
       <template #title>
-        <h3 class="card-title font-bold">PCF Details</h3>
-        <hr>
       </template>
 
-      <table>
-        <tr>
-          <th>PCF ID:</th>
-          <td>{{ pcf.pcfId }}</td>
-        </tr>
-        <tr>
-          <th>Product ID:</th>
-          <td>{{ pcf.productId }}</td>
-        </tr>
-        <tr>
-          <th>Product Name:</th>
-          <td>{{ pcf.productName }}</td>
-        </tr>
-        <tr>
-          <th>Amount:</th>
-          <td>{{ pcf.amount }}</td>
-        </tr>
-        <tr>
-          <th>Emission per Unit:</th>
-          <td>{{ pcf.emissionPerUnit }} tCO2</td>
-        </tr>
-        <tr>
-          <th>Version:</th>
-          <td>{{ pcf.version }}</td>
-        </tr>
-        <tr>
-          <th>Status:</th>
-          <td>{{ pcf.pcfStatus }}</td>
-        </tr>
-      </table>
+      <!-- Use the PCF component and pass the pcf data -->
+      <PCFComponent :pcf="pcf" />
 
       <template #footer>
         <div class="py-3 px-4 flex justify-between">
           <button class="btn btn-sm" @click="router.back()">Go Back</button>
 
           <div class="flex space-x-3">
-            <button class="btn btn-sm btn-error" @click="markAsDeprecated">Mark deprecated</button>
-            <NuxtLink :to="`/me/published/${id}/update`" class="btn btn-sm btn-success">Update PCF</NuxtLink >
+            <button class="btn btn-sm btn-error" @click="markAsDeprecated">
+              Mark deprecated
+            </button>
+            <NuxtLink
+              :to="`/me/published/${id}/update`"
+              class="btn btn-sm btn-success"
+              >Update PCF</NuxtLink
+            >
           </div>
         </div>
       </template>
@@ -53,40 +28,44 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthenticator } from '@aws-amplify/ui-vue'
-import type { MandeInstance } from 'mande'
-import type { Authenticator } from '~/global'
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthenticator } from "@aws-amplify/ui-vue";
+import type { MandeInstance } from "mande";
+import type { Authenticator } from "~/global";
+import type { PCF as PCFType } from "~/composables/useMande";
+import PCFComponent from "~/components/PCF.vue"; // Import the PCF component with a distinct name
 
-const { id } = useRoute().params
-const router = useRouter()
+const { id } = useRoute().params;
+const router = useRouter();
 
-useBreadcrumb('PCF Detail')
+useBreadcrumb("PCF Detail");
 
-const api = inject<MandeInstance>('api')!
-const auth = useAuthenticator() as Authenticator
-const pcf = ref<PCF>()
-
+const api = inject<MandeInstance>("api")!;
+const auth = useAuthenticator() as Authenticator;
+const pcf = ref<PCFType>();
 
 onMounted(async () => {
-  const { pcfs } = await api.get<{ pcfs: PCF[] }>('/pcf', {
-    query: { dataOwnerId: auth.user?.userId, pcfId: id }
-  }).catch(() => ({ pcfs: [] }))
+  const { pcfs } = await api
+    .get<{ pcfs: PCFType[] }>("/pcf", {
+      query: { pcfId: id },
+    })
+    .catch(() => ({ pcfs: [] }));
 
-  pcf.value = pcfs[0]
+  pcf.value = pcfs[0];
 
   if (!pcf.value) {
-    router.push('/me/published')
+    router.push("/me/published");
   }
-})
+});
 
 const markAsDeprecated = async () => {
   await api.put(`/pcf/${id}`, {
     pcfId: id,
-    version: pcf.value!.version || '1',
-    pcfStatus: 'deprecated'
-  })
-}
-
+    version: pcf.value!.version || "1",
+    pcfStatus: "deprecated",
+  });
+};
 </script>
 
 <style scoped>

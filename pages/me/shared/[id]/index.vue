@@ -1,0 +1,47 @@
+<template>
+  <div>
+    <DataViewPaginate v-if="pcf">
+      <!-- Use the PCF component and pass the pcf data as a prop -->
+      <PCFComponent :pcf="pcf" />
+
+      <template #footer>
+        <div class="py-3 px-4 flex justify-between">
+          <button class="btn btn-sm" @click="router.back()">Go Back</button>
+        </div>
+      </template>
+    </DataViewPaginate>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthenticator } from "@aws-amplify/ui-vue";
+import type { MandeInstance } from "mande";
+import type { Authenticator } from "~/global";
+import type { PCF } from "~/composables/useMande";
+import PCFComponent from "~/components/PCF.vue"; // Renamed component import
+
+const { id } = useRoute().params;
+const router = useRouter();
+
+useBreadcrumb("PCF Detail");
+
+const api = inject<MandeInstance>("api")!;
+const auth = useAuthenticator() as Authenticator;
+const pcf = ref<PCF | undefined>(undefined);
+
+onMounted(async () => {
+  const { pcfs } = await api
+    .get<{ pcfs: PCF[] }>("/pcf", {
+      query: { pcfId: id },
+    })
+    .catch(() => ({ pcfs: [] }));
+
+  pcf.value = pcfs[0];
+
+  if (!pcf.value) {
+    router.push("/me/shared");
+  }
+});
+</script>
