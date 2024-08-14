@@ -1,26 +1,19 @@
 <template>
   <div>
-    <DataViewPaginate v-if="pcf">
-      <!-- Use the PCF component and pass the pcf data as a prop -->
-      <PCFComponent :pcf="pcf" />
-
-      <template #footer>
-        <div class="py-3 px-4 flex justify-between">
-          <button class="btn btn-sm" @click="router.back()">Go Back</button>
-        </div>
-      </template>
-    </DataViewPaginate>
+    <PCF v-if="pcf" :pcf="pcf" />
+    <template v-else>
+      <p>Loading...</p>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
-import type { PCF } from "~/composables/useMande";
-import PCFComponent from "~/components/PCF.vue"; // Renamed component import
+import PCF from "@/components/PCF.vue"; // Adjust the import path as necessary
 
 const { id } = useRoute().params;
 const router = useRouter();
@@ -29,7 +22,7 @@ useBreadcrumb("PCF Detail");
 
 const api = inject<MandeInstance>("api")!;
 const auth = useAuthenticator() as Authenticator;
-const pcf = ref<PCF | undefined>(undefined);
+const pcf = ref<PCF>();
 
 onMounted(async () => {
   const { pcfs } = await api
@@ -45,3 +38,15 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+/* Your CSS styles here */
+table {
+  font-size: 1rem;
+}
+
+th {
+  text-align: left;
+  padding: 0.5rem; /* Use standard CSS properties instead of Tailwind utility classes */
+}
+</style>

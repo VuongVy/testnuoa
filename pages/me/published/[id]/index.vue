@@ -2,10 +2,40 @@
   <div>
     <DataViewPaginate v-if="pcf">
       <template #title>
+        <h3 class="card-title font-bold">PCF Details</h3>
+        <hr />
       </template>
 
-      <!-- Use the PCF component and pass the pcf data -->
-      <PCFComponent :pcf="pcf" />
+      <table>
+        <tr>
+          <th>PCF ID:</th>
+          <td>{{ pcf.pcfId }}</td>
+        </tr>
+        <tr>
+          <th>Product ID:</th>
+          <td>{{ pcf.productId }}</td>
+        </tr>
+        <tr>
+          <th>Product Name:</th>
+          <td>{{ pcf.productName }}</td>
+        </tr>
+        <tr>
+          <th>Amount:</th>
+          <td>{{ pcf.amount }}</td>
+        </tr>
+        <tr>
+          <th>Emission per Unit:</th>
+          <td>{{ pcf.emissionPerUnit }} tCO2</td>
+        </tr>
+        <tr>
+          <th>Version:</th>
+          <td>{{ pcf.version }}</td>
+        </tr>
+        <tr>
+          <th>Status:</th>
+          <td>{{ pcf.pcfStatus }}</td>
+        </tr>
+      </table>
 
       <template #footer>
         <div class="py-3 px-4 flex justify-between">
@@ -28,13 +58,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
-import type { PCF as PCFType } from "~/composables/useMande";
-import PCFComponent from "~/components/PCF.vue"; // Import the PCF component with a distinct name
 
 const { id } = useRoute().params;
 const router = useRouter();
@@ -43,12 +69,12 @@ useBreadcrumb("PCF Detail");
 
 const api = inject<MandeInstance>("api")!;
 const auth = useAuthenticator() as Authenticator;
-const pcf = ref<PCFType>();
+const pcf = ref<PCF>();
 
 onMounted(async () => {
   const { pcfs } = await api
-    .get<{ pcfs: PCFType[] }>("/pcf", {
-      query: { pcfId: id },
+    .get<{ pcfs: PCF[] }>("/pcf", {
+      query: { isDataOwner: true, pcfId: id },
     })
     .catch(() => ({ pcfs: [] }));
 

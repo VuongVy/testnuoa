@@ -2,7 +2,7 @@
   <DataViewPaginate class="min-h-[60vh]">
     <template #title>
       <div class="flex justify-between space-x-3 px-3">
-        <h3 class="card-title font-bold">Incoming Requests</h3>
+        <h3 class="card-title font-bold">Sent Requests</h3>
       </div>
       <hr />
     </template>
@@ -12,33 +12,28 @@
         <tr>
           <th>PCF ID</th>
           <th>Data Owner Company</th>
-          <th>Data Owner Email</th>
           <th>Requested Date</th>
-          <th>Requested Status</th>
+          <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in requests" :key="item.requestId" class="hover">
-          <td>{{ item.pcfId }}</td>
+        <tr
+          v-for="item in requests"
+          :key="item.pcfId + item.dataOwnerEmail"
+          class="hover"
+        >
+          <td class="font-bold">{{ item.pcfId }}</td>
           <td>{{ item.dataOwnerCompany }}</td>
-          <td>{{ item.dataOwnerEmail }}</td>
           <td>{{ formatDate(item.dateRequested) }}</td>
           <td>
-            <span
-              class="font-bold"
-              :class="{
-                'text-success': item.requestStatus === 'approved',
-                'text-error': item.requestStatus === 'denied',
-                'text-warning': item.requestStatus === 'pending',
-              }"
-            >
+            <span :class="statusClass(item.requestStatus)">
               {{ item.requestStatus }}
             </span>
           </td>
           <td>
             <NuxtLink
-              :to="`/me/incoming/manage/${item.requestId}`"
+              :to="`/me/incoming/manage/${item.pcfId}`"
               class="link text-blue-600"
               style="display: block; width: 5rem"
             >
@@ -52,27 +47,57 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { useAuthenticator } from "@aws-amplify/ui-vue";
-import type { MandeInstance } from "mande";
 import DataViewPaginate from "~/components/DataViewPaginate.vue";
-import type { RequestAccess } from "~/composables/useMande";
+import type { MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
+
+// Type for request access
+type RequestAccess = {
+  pcfId: string;
+  requesterCompany: string;
+  requesterEmail: string;
+  dateProcessed: string;
+  dateRequested: string;
+  message: string;
+  requestStatus: string;
+  version: number;
+};
 
 const api = inject<MandeInstance>("api")!;
 const auth = useAuthenticator() as Authenticator;
 
 const requests = ref<RequestAccess[]>([]);
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(); // or use any other date formatting method
-};
-
 onMounted(async () => {
-  const response = await api.get<{ requests: RequestAccess[] }>("/request", {
-    query: { userType: "requestor" },
-  });
-  requests.value = response.requests;
+  try {
+    const response = await api.get<{ requests: RequestAccess[] }>("/request", {
+      query: { userType: "requestor" },
+    });
+    requests.value = response.requests;
+  } catch (error) {
+    console.error("Failed to fetch requests", error);
+  }
 });
+
+// Helper function to format dates
+function formatDate(date: string): string {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString();
+}
+
+// Helper function to determine status class
+function statusClass(status: string): string {
+  switch (status) {
+    case "approved":
+      return "font-bold text-success capitalize";
+    case "pending":
+      return "font-bold text-warning capitalize";
+    case "rejected":
+      return "font-bold text-error capitalize";
+    default:
+      return "font-bold text-muted capitalize";
+  }
+}
 </script>

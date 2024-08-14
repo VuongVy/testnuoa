@@ -1,6 +1,6 @@
 <template>
   <div class="card shadow bg-base-100">
-    <h3 class="card-title font-bold m-4">PCF Details</h3>
+    <h3 class="card-title m-4">PCF Details</h3>
     <hr />
     <div class="card-body">
       <div class="flex justify-between">
@@ -13,10 +13,21 @@
             {{ pcf.emissionPerUnit ? pcf.emissionPerUnit + " tCO2" : "---" }}
           </p>
           <p><strong>Version:</strong> {{ pcf.version }}</p>
-          <p><strong>Status:</strong> {{ pcf.pcfStatus ?? "---" }}</p>
+          <p>
+            <strong>Status:</strong>
+            <a v-if="pcf.pcfStatus === 'active'" class="text-success">Active</a>
+            <a v-else-if="pcf.pcfStatus === 'deprecated'" class="text-error"
+              >Deprecated</a
+            >
+            <a v-else class="text-warning">{{ pcf.pcfStatus }}</a>
+          </p>
           <p>
             <strong>Additional Info:</strong>
-            {{ pcf.additionalData?.dataQuality ?? "---" }}
+            {{
+              isEmptyObject(pcf.additionalData)
+                ? "N/A"
+                : formatAdditionalData(pcf.additionalData)
+            }}
           </p>
         </div>
 
@@ -26,20 +37,30 @@
               class="max-w-[250px] rounded-full ring ring-primary ring-offset-base-100 ring-offset-2"
             >
               <img
-                src="https://icons.veryicon.com/png/o/system/crm-android-app-icon/app-icon-person.png"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgqaPZ6HpmxExPx5g_Rxgp8o0vPAdSCZcxMQ&usqp=CAU"
               />
             </div>
           </div>
-
-          <p class="mt-3 opacity-65">This PCF belongs to {{ pcf.company }}</p>
+          <p class="mt-3 opacity-65">This PCF belongs to company A</p>
         </div>
       </div>
     </div>
+    <hr />
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { PropType } from "vue";
+
+// Utility functions to check if an object is empty and format additionalData
+function isEmptyObject(obj: any): boolean {
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+}
+
+function formatAdditionalData(data: any): string {
+  // Customize this function based on how you want to display additionalData
+  return JSON.stringify(data);
+}
 
 defineProps({
   pcf: { type: Object as PropType<PCF>, required: true },

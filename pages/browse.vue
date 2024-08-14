@@ -60,15 +60,16 @@
           <th>Product Name</th>
           <th>Data Owner</th>
           <th>Version</th>
-          <th>Published</th>
+          <th>Published Date</th>
+          <th>PCF Status</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in pcfs" class="hover">
+        <tr v-for="item in pcfs" :key="item.pcfId" class="hover">
           <th>{{ item.pcfId }}</th>
           <td>{{ item.productName }}</td>
-          <td>{{ item.company ?? "---" }}</td>
+          <td>{{ item.company }}</td>
           <td>{{ item.version }}</td>
           <td>
             {{
@@ -78,6 +79,9 @@
                 .map((it) => +it)
                 .join("/")
             }}
+          </td>
+          <td :class="statusClass(item.pcfStatus)">
+            {{ item.pcfStatus }}
           </td>
           <td v-if="user?.userId !== item.dataOwnerId">
             <a
@@ -107,26 +111,39 @@ import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { Authenticator } from "~/global";
 
 const requester = ref<InstanceType<typeof RequestDialog>>();
-const status = ref<SubmitResponse | undefined>(undefined);
+const status = ref<SubmitResponse>();
 const api = await useMande();
 const { user } = useAuthenticator() as Authenticator;
 
 const pcfs = ref<PCF[]>([]);
 
-useBreadcrumb("Browse PCFs Page"); // Ensure useBreadcrumb is imported and defined
+useBreadcrumb("Browse PCFs Page");
 
 onMounted(async () => {
   try {
-    const response = await api.get<{ pcfs: PCF[]; lastEvaluatedKey?: string }>(
+    const data = await api.get<{ pcfs: PCF[]; lastEvaluatedKey?: string }>(
       "/pcf",
       {
         query: { isDataOwner: "false" },
       }
     );
-    pcfs.value = response.pcfs;
+    pcfs.value = data.pcfs;
   } catch (error) {
-    console.error("Error fetching PCFs:", error);
-    // Optionally, handle the error, e.g., show a notification to the user
+    console.error("Failed to fetch PCFs", error);
   }
 });
+
+// Helper function to determine status class
+function statusClass(status: string): string {
+  switch (status) {
+    case "active":
+      return "font-bold text-success capitalize";
+    case "deprecated":
+      return "font-bold text-error capitalize";
+    case "pending":
+      return "font-bold text-warning capitalize";
+    default:
+      return "font-bold text-muted capitalize";
+  }
+}
 </script>

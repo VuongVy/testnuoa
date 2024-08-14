@@ -35,8 +35,12 @@
           <td>{{ pcf.emissionPerUnit }}</td>
           <td>{{ pcf.version }}</td>
           <td>
-            <a class="text-success" v-if="pcf.pcfStatus === 'active'">Active</a>
-            <a class="text-error" v-else-if="pcf.pcfStatus === 'deprecated'"
+            <a class="text-success font-bold" v-if="pcf.pcfStatus === 'active'"
+              >Active</a
+            >
+            <a
+              class="text-error font-bold"
+              v-else-if="pcf.pcfStatus === 'deprecated'"
               >Deprecated</a
             >
             <a class="text-warning" v-else>{{ pcf.pcfStatus }}</a>
@@ -62,7 +66,7 @@ const pcfs = ref<PCF[]>([]);
 
 onMounted(async () => {
   const response = await api.get<{ pcfs: PCF[] }>("/pcf", {
-    query: { isDataOwner: "true", userId: auth.user?.userId },
+    query: { isDataOwner: "true" },
   });
 
   pcfs.value = response.pcfs;

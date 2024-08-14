@@ -2,7 +2,7 @@
   <DataViewPaginate class="min-h-[60vh]">
     <template #title>
       <div class="flex justify-between space-x-3 px-3">
-        <h3 class="card-title font-bold">PCFs Shared With Me</h3>
+        <h3 class="card-title font-bold">Shared With Me</h3>
         <NuxtLink to="/me/published/create" class="btn btn-sm btn-success"
           >New PCF</NuxtLink
         >
@@ -15,10 +15,10 @@
         <tr>
           <th>PCF ID</th>
           <th>Product Name</th>
-          <th>Data Owner</th>
+          <th>Company Name</th>
           <th>Date Published</th>
           <th>Version</th>
-          <th>Status</th>
+          <th>PCF Status</th>
         </tr>
       </thead>
       <tbody>
@@ -33,8 +33,12 @@
           <td>{{ pcf.datePublished }}</td>
           <td>{{ pcf.version }}</td>
           <td>
-            <a class="text-success" v-if="pcf.pcfStatus === 'active'">Active</a>
-            <a class="text-error" v-else-if="pcf.pcfStatus === 'deprecated'"
+            <a class="text-success font-bold" v-if="pcf.pcfStatus === 'active'"
+              >Active</a
+            >
+            <a
+              class="text-error font-bold"
+              v-else-if="pcf.pcfStatus === 'deprecated'"
               >Deprecated</a
             >
             <a class="text-warning" v-else>{{ pcf.pcfStatus }}</a>
