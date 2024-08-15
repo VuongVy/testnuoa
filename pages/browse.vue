@@ -1,42 +1,4 @@
 <template>
-  <transition name="fade" appear>
-    <div
-      v-if="status?.success"
-      role="alert"
-      class="alert bg-green-200 shadow my-3"
-    >
-      <Icon
-        name="fa:paper-plane"
-        class="text-success size-7"
-        @click="status = undefined"
-      />
-
-      <span>{{ status.message }}</span>
-
-      <button class="btn btn-sm btn-ghost btn-circle">
-        <Icon name="ic:close" class="size-6" />
-      </button>
-    </div>
-
-    <div
-      v-else-if="status?.success === false"
-      role="alert"
-      class="alert bg-red-200 shadow my-3"
-    >
-      <Icon
-        name="fa:paper-plane"
-        class="text-error size-7"
-        @click="status = undefined"
-      />
-
-      <span>{{ status.message }}</span>
-
-      <button class="btn btn-sm btn-ghost btn-circle">
-        <Icon name="ic:close" class="size-6" />
-      </button>
-    </div>
-  </transition>
-
   <DataViewPaginate class="min-h-[60vh]">
     <template #title>
       <div class="flex space-x-3">
@@ -98,20 +60,19 @@
   </DataViewPaginate>
 
   <Teleport to="body">
-    <RequestDialog ref="requester" @status="(event) => (status = event)" />
+    <RequestDialog ref="requester" />
   </Teleport>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import DataViewPaginate from "~/components/DataViewPaginate.vue";
-import RequestDialog, { type SubmitResponse } from "./browse/RequestDialog.vue";
+import RequestDialog from "./browse/RequestDialog.vue";
 import { useMande, type PCF } from "~/composables/useMande";
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { Authenticator } from "~/global";
 
 const requester = ref<InstanceType<typeof RequestDialog>>();
-const status = ref<SubmitResponse>();
 const api = await useMande();
 const { user } = useAuthenticator() as Authenticator;
 
@@ -122,7 +83,7 @@ useBreadcrumb("Browse PCFs");
 onMounted(async () => {
   try {
     const data = await api.get<{ pcfs: PCF[]; lastEvaluatedKey?: string }>(
-      "/pcfs",
+      "/pcf",
       {
         query: { isDataOwner: "false" },
       }

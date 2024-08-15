@@ -31,9 +31,6 @@ import dayjs from 'dayjs'
 
 const dialog = ref<InstanceType<typeof Modal>>()
 const api = inject<MandeInstance>('api')!
-const emit = defineEmits<{
-  status: [status: SubmitResponse]
-}>()
 
 const pcf = reactive({
   pcfId: '',
@@ -41,7 +38,6 @@ const pcf = reactive({
   dataOwnerId: '',
   version: '',
 })
-
 
 const open = (pcfId: string, version: string, dataOwnerId: string) => {
   pcf.pcfId = pcfId
@@ -53,16 +49,24 @@ const open = (pcfId: string, version: string, dataOwnerId: string) => {
 }
 
 const submit = async () => {
-  const status = await api.post<SubmitResponse>('/request', {
+  await api.post<SubmitResponse>('/request', {
     ... pcf,
     dateRequested: dayjs().format('YYYY-MM-DD'),
-  }).catch((e: MandeError) => {
-    return { ...e.body, success: false }
   })
-
-  status.success ??= true
-
-  emit('status', status)
+  .then(() => {
+    notify({
+      icon: 'fa:paper-plane',
+      message: 'Your request has been sent. A notification will be sent to the DO shortly. Please be patient!!!',
+      mode: 'success',
+    })
+  })
+  .catch((e: MandeError) => {
+    notify({
+      icon: 'fa:paper-plane',
+      message: e.body.message ?? 'Failed to send request',
+      mode: 'error',
+    })
+  })
 
   dialog.value?.close()
 }
