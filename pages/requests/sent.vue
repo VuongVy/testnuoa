@@ -3,5 +3,5 @@
 </template>
 
 <script lang="ts" setup>
-useBreadcrumb("Sent Requests");
+useBreadcrumb("My Requests");
 </script>

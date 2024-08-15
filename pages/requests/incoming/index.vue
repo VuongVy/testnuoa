@@ -2,7 +2,7 @@
   <DataViewPaginate class="min-h-[60vh]">
     <template #title>
       <div class="flex justify-between space-x-3 px-3">
-        <h3 class="card-title font-bold">Current Requests</h3>
+        <h3 class="card-title font-bold">Incoming Requests</h3>
       </div>
       <hr />
     </template>
@@ -33,7 +33,9 @@
           </td>
           <td>
             <NuxtLink
-              :to="`/me/incoming/manage/${item.pcfId}`"
+              :to="`/requests/incoming/manage/${encodeURIComponent(
+                item.requestId
+              )}`"
               class="link text-blue-600"
               style="display: block; width: 5rem"
             >
@@ -53,7 +55,8 @@ import DataViewPaginate from "~/components/DataViewPaginate.vue";
 import type { MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
 
-// Type for request access
+useBreadcrumb("Incoming Requests");
+
 type RequestAccess = {
   pcfId: string;
   requesterCompany: string;
@@ -81,13 +84,11 @@ onMounted(async () => {
   }
 });
 
-// Helper function to format dates
 function formatDate(date: string): string {
   const dateObj = new Date(date);
   return dateObj.toLocaleDateString();
 }
 
-// Helper function to determine status class
 function statusClass(status: string): string {
   switch (status) {
     case "approved":
@@ -97,7 +98,7 @@ function statusClass(status: string): string {
     case "rejected":
       return "font-bold text-error capitalize";
     default:
-      return "font-bold text-muted capitalize";
+      return "font-bold text-error capitalize";
   }
 }
 </script>

@@ -33,7 +33,9 @@
           </td>
           <td>
             <NuxtLink
-              :to="`/me/incoming/manage/${item.pcfId}`"
+              :to="`/requests/sent/manage/${encodeURIComponent(
+                item.requestId
+              )}`"
               class="link text-blue-600"
               style="display: block; width: 5rem"
             >
@@ -52,6 +54,8 @@ import { useAuthenticator } from "@aws-amplify/ui-vue";
 import DataViewPaginate from "~/components/DataViewPaginate.vue";
 import type { MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
+
+useBreadcrumb("Sent Requests");
 
 // Type for request access
 type RequestAccess = {
@@ -94,7 +98,7 @@ function statusClass(status: string): string {
       return "font-bold text-success capitalize";
     case "pending":
       return "font-bold text-warning capitalize";
-    case "rejected":
+    case "denied":
       return "font-bold text-error capitalize";
     default:
       return "font-bold text-muted capitalize";

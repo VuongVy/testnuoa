@@ -117,7 +117,7 @@ const { user } = useAuthenticator() as Authenticator;
 
 const pcfs = ref<PCF[]>([]);
 
-useBreadcrumb("Browse PCFs Page");
+useBreadcrumb("Browse PCFs");
 
 onMounted(async () => {
   try {

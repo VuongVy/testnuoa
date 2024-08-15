@@ -15,8 +15,12 @@
           <p><strong>Version:</strong> {{ pcf.version }}</p>
           <p>
             <strong>Status:</strong>
-            <a v-if="pcf.pcfStatus === 'active'" class="text-success">Active</a>
-            <a v-else-if="pcf.pcfStatus === 'deprecated'" class="text-error"
+            <a v-if="pcf.pcfStatus === 'active'" class="text-success font-bold"
+              >Active</a
+            >
+            <a
+              v-else-if="pcf.pcfStatus === 'deprecated'"
+              class="text-error font-bold"
               >Deprecated</a
             >
             <a v-else class="text-warning">{{ pcf.pcfStatus }}</a>
@@ -41,7 +45,7 @@
               />
             </div>
           </div>
-          <p class="mt-3 opacity-65">This PCF belongs to company A</p>
+          <p class="mt-3 opacity-65">This PCF belongs to {{ pcf.company }}</p>
         </div>
       </div>
     </div>

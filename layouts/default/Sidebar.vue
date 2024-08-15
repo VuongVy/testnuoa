@@ -45,7 +45,7 @@ const links: Links = {
     icon: "ic:outline-home",
     children: {
       published: { name: "My Published PCFs" },
-      shared: { name: "PCF Shared with Me" },
+      shared: { name: "PCF Shared With Me" },
     },
   },
   requests: {

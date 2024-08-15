@@ -1,6 +1,6 @@
 <template>
   <DataViewPaginate title="Newly Published PCFs">
-    <table class="table table-sm">
+    <table v-if="pcfs.length > 0" class="table table-sm">
       <!-- head -->
       <thead>
         <tr>
@@ -38,6 +38,9 @@
         </tr>
       </tbody>
     </table>
+    <p v-else class="text-center">
+      😢 No new PCF today. Please check back later!
+    </p>
   </DataViewPaginate>
 </template>
 
@@ -54,11 +57,19 @@ const auth = useAuthenticator() as Authenticator;
 const pcfs = ref([]);
 
 onMounted(async () => {
-  const response = await api.get<{ pcfs: any[] }>("/pcf", {
-    query: { isDataOwner: "false", publishedToday: "true" },
-  });
+  try {
+    const response = await api.get<{ pcfs: any[] }>("/pcf", {
+      query: { isDataOwner: "false", publishedToday: "true" },
+    });
 
-  pcfs.value = response.pcfs;
+    if (response.pcfs && response.pcfs.length > 0) {
+      pcfs.value = response.pcfs;
+    } else {
+      console.log("No PCFs found matching the query");
+    }
+  } catch (error) {
+    console.error("Error fetching PCFs:", error);
+  }
 });
 
 const navigateTo = (path: string) => {

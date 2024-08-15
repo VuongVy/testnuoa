@@ -55,7 +55,7 @@ import type { MandeInstance } from "mande";
 import DataViewPaginate from "~/components/DataViewPaginate.vue";
 import type { Authenticator } from "~/global";
 
-useBreadcrumb("All published PCFs");
+useBreadcrumb("PCF Shared With Me");
 
 const api = inject<MandeInstance>("api")!;
 const auth = useAuthenticator() as Authenticator;

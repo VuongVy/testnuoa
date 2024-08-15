@@ -3,5 +3,5 @@
 </template>
 
 <script lang="ts" setup>
-useBreadcrumb('My published PCF')
+useBreadcrumb("My PCFs");
 </script>
