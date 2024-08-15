@@ -17,7 +17,7 @@ export const notify = (notification: Notification) => {
 
   notifications.value.push(notification)
 
-  setTimeout(() => {
+  timeout && setTimeout(() => {
     const index = notifications.value.indexOf(notification)
     index !== -1 && notifications.value.splice(index, 1)
   }, timeout)

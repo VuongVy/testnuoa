@@ -42,7 +42,7 @@ const links: Links = {
   home: { name: "Home", icon: "ic:outline-home" },
   me: {
     name: "My PCFs",
-    icon: "ic:outline-home",
+    icon: "game-icons:jigsaw-piece",
     children: {
       published: { name: "My Published PCFs" },
       shared: { name: "PCF Shared With Me" },

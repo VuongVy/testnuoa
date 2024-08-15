@@ -122,13 +122,18 @@ useBreadcrumb("Browse PCFs");
 onMounted(async () => {
   try {
     const data = await api.get<{ pcfs: PCF[]; lastEvaluatedKey?: string }>(
-      "/pcf",
+      "/pcfs",
       {
         query: { isDataOwner: "false" },
       }
     );
     pcfs.value = data.pcfs;
   } catch (error) {
+    notify({
+      icon: "icon-park-outline:file-failed-one",
+      message: "Failed to fetch PCFs",
+      mode: "error",
+    });
     console.error("Failed to fetch PCFs", error);
   }
 });

@@ -12,7 +12,7 @@
     >
       <Icon
         v-if="item.icon"
-        name="fa:paper-plane"
+        :name="item.icon"
         class="size-7"
         :class="{
           'text-success': item.mode === 'success',
