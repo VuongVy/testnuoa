@@ -84,10 +84,19 @@ const create = async () => {
     ... pcf,
     additionalData
   }).then(() => {
-    alert('PCF created successfully')
+    notify({
+      icon: 'fa:paper-plane',
+      message: 'Your PCF has been created successfully',
+      mode: 'success',
+    })
+
     navigateTo('/me/published')
   }).catch((error: MandeError) => {
-    alert(error.body.message)
+    notify({
+      icon: 'fa:paper-plane',
+      message: error.body.message ?? 'Failed to create PCF',
+      mode: 'error',
+    })
   })
 }
 

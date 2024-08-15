@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex space-x-5 mx-auto max-w-6xl">
+    <div v-show="false" class="flex space-x-5 mx-auto max-w-6xl">
       <div class="card card-compact bg-base-100 w-full shadow">
         <div class="card-body">
           <div class="flex">
@@ -42,7 +42,7 @@
 
     </div>
 
-    <NuxtPage class="mt-5" :transition="{ name: 'slide-right', mode: 'out-in' }" />
+    <NuxtPage :transition="{ name: 'slide-right', mode: 'out-in' }" />
   </div>
 </template>
 
