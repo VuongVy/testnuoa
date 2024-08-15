@@ -83,7 +83,6 @@
 <script lang="ts" setup>
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { MandeError, MandeInstance } from "mande";
-import { notify } from "~/components/Alert.vue";
 import type { Authenticator } from "~/global";
 
 const { id } = useRoute().params;
@@ -123,7 +122,7 @@ const update = async () => {
         mode: "success",
       })
 
-      navigateTo("/me/published/" + id);
+      navigateTo("/me/published/");
     })
     .catch((error: MandeError) => {
       notify({

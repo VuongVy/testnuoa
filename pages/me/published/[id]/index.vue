@@ -79,8 +79,7 @@
 
 <script lang="ts" setup>
 import { useAuthenticator } from "@aws-amplify/ui-vue";
-import type { MandeInstance } from "mande";
-import { notify } from "~/components/Alert.vue";
+import type { MandeError, MandeInstance } from "mande";
 import type { Authenticator } from "~/global";
 
 const { id } = useRoute().params;
@@ -117,8 +116,14 @@ const markAsDeprecated = async () => {
       message: "PCF marked as deprecated",
       mode: "success",
     })
-
-    pcf.value!.pcfStatus = 'deprecated'
+    
+    navigateTo("/me/published");
+  }).catch((error: MandeError) => {
+    notify({
+      icon: "fa:paper-plane",
+      message: error.body.message ?? "Failed to mark PCF as deprecated",
+      mode: "error",
+    });
   });
 };
 

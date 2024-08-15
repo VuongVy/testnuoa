@@ -29,34 +29,9 @@
   </TransitionGroup>
 </template>
 
-<script lang="ts">
-type Notification = {
-  icon?: string
-  message: string
-  mode?: 'success' | 'error'
-}
-
-const notifications = ref(new Array<Notification>())
-
-export const notify = (notification: Notification) => {
-  notifications.value.push(notification)
-}
-</script>
-
 <script lang="ts" setup>
-notifications.value.push({
-  icon: 'fa:paper-plane',
-  message: 'This is a success message',
-  mode: 'success'
-})
-
-notifications.value.push({
-  icon: 'fa:paper-plane',
-  message: 'This is an error message',
-  mode: 'error'
-})
+const notifications = useNotification();
 </script>
-
 
 <style scoped>
 .list-move, /* apply transition to moving elements */
