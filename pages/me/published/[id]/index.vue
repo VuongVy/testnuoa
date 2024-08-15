@@ -57,7 +57,9 @@
 
       <template #footer>
         <div class="footer">
-          <button class="btn btn-sm" @click="router.back()">Go Back</button>
+          <div>
+            <button class="btn btn-sm" @click="router.back()">Go Back</button>
+          </div>
 
           <div class="flex space-x-3">
             <button class="btn btn-sm btn-error" @click="markAsDeprecated">
@@ -78,6 +80,7 @@
 <script lang="ts" setup>
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { MandeInstance } from "mande";
+import { notify } from "~/components/Alert.vue";
 import type { Authenticator } from "~/global";
 
 const { id } = useRoute().params;
@@ -108,6 +111,14 @@ const markAsDeprecated = async () => {
     pcfId: id,
     version: pcf.value!.version || "1",
     pcfStatus: "deprecated",
+  }).then(() => {
+    notify({
+      icon: "fa:paper-plane",
+      message: "PCF marked as deprecated",
+      mode: "success",
+    })
+
+    pcf.value!.pcfStatus = 'deprecated'
   });
 };
 

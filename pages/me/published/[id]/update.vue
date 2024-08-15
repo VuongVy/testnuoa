@@ -83,6 +83,7 @@
 <script lang="ts" setup>
 import { useAuthenticator } from "@aws-amplify/ui-vue";
 import type { MandeError, MandeInstance } from "mande";
+import { notify } from "~/components/Alert.vue";
 import type { Authenticator } from "~/global";
 
 const { id } = useRoute().params;
@@ -116,10 +117,20 @@ const update = async () => {
   await api
     .put("/pcf/" + id, payload)
     .then(() => {
-      alert("PCF updated successfully");
+      notify({
+        icon: "fa:paper-plane",
+        message: "PCF updated successfully",
+        mode: "success",
+      })
+
+      navigateTo("/me/published/" + id);
     })
     .catch((error: MandeError) => {
-      alert(error.body.message ?? "Failed to update PCF");
+      notify({
+        icon: "fa:paper-plane",
+        message: error.body.message ?? "Failed to update PCF",
+        mode: "error",
+      });
     });
 };
 

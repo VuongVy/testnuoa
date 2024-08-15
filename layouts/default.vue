@@ -3,6 +3,7 @@
     <input :id="drawerID" type="checkbox" v-model="drawer" class="drawer-toggle" />
     <div class="drawer-content bg-base-200">
       <Navbar />
+      <Alert />
 
       <div class="p-5">
         <NuxtPage /> 
